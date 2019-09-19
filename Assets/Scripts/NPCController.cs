@@ -70,7 +70,7 @@ public class NPCController : MonoBehaviour
                 {
                     label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Pursue algorithm!";
                 }
-                SteeringOutput steering3 = ai.Wander();
+                SteeringOutput steering3 = ai.Pursue();
                 linear = steering3.linear;
                 angular = steering3.angular;
                 break;
@@ -87,21 +87,25 @@ public class NPCController : MonoBehaviour
             case 5:
                 if (label)
                 {
-                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Fifth algorithm";
+                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Align algorithm";
                 }
-                //ALIGN
+                //SteeringOutput steering5 = ai.Align();
+                //linear = steering5.linear;
+                //angular = steering5.angular;
                 break;
             case 6:
                 if (label)
                 {
-                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Sixth algorithm";
+                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Face algorithm";
                 }
-                //FACE
+                SteeringOutput steering5 = ai.Face();
+                linear = steering5.linear;
+                angular = steering5.angular;
                 break;
             case 7:
                 if (label)
                 {
-                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Seventh algorithm";
+                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Wander algorithm";
                 }
                 // WANDER
                 break;
