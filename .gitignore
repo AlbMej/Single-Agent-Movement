@@ -17,4 +17,5 @@ Unity.PackageManagerUI.Editor.csproj
 Unity.TextMeshPro.Editor.csproj
 Unity.TextMeshPro.csproj
 UnityEditor.StandardEvents.csproj
+.DS_Store
 
