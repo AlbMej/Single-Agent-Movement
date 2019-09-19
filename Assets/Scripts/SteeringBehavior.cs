@@ -178,4 +178,11 @@ public class SteeringBehavior : MonoBehaviour
         return steering;
     }
 
+    public SteeringOutput Evade() {
+        SteeringOutput steering;
+        steering = this.Pursue();
+        steering.linear = -steering.linear;
+        return steering;
+    }
+
 }
