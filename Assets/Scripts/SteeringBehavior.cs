@@ -60,6 +60,10 @@ public class SteeringBehavior : MonoBehaviour
         //wanderOrientation = agent.orientation;
     }
 
+    /* These functions follow the pseudo-code for arrive in the book
+     * AI for Games by Ian Millington
+     */
+
     public SteeringOutput Seek()
     {
         SteeringOutput steering = new SteeringOutput
@@ -68,15 +72,24 @@ public class SteeringBehavior : MonoBehaviour
         };
         steering.linear = target.position - agent.position;
         float distance = (target.position - agent.position).magnitude;
-        if (distance < slowRadiusL)
+        
+        if (distance < (target.position * slowRadiusA).magnitude *2)
         {
-            DynamicArrive();
+            agent.DrawCircle(agent.position, 1.0f);
+            
+            agent.velocity = Vector3.zero;
+            steering.linear = Vector3.zero;
+            return this.Face();
+            //return steering; // Return None
         }
         else
         {
             steering.linear.Normalize();
             steering.linear *= maxAcceleration;
         }
+        //steering.linear.Normalize();
+        //steering.linear *= maxAcceleration;
+        steering.angular = 0;
         return steering;
     }
 
@@ -93,10 +106,6 @@ public class SteeringBehavior : MonoBehaviour
 
     public SteeringOutput DynamicArrive()
     {
-        /* This functions follows the pseudo-code for arrive in the book
-         * AI for Games by Ian Millington
-         */
-
         // Create the structure to hold our output
         SteeringOutput steering = new SteeringOutput();
 
@@ -107,6 +116,8 @@ public class SteeringBehavior : MonoBehaviour
         // Check if we are there, return no steering
         if (distance < targetRadiusL)
         {
+            agent.velocity = Vector3.zero;
+            steering.linear = Vector3.zero;
             return steering; // Return None
         }
 
@@ -118,9 +129,8 @@ public class SteeringBehavior : MonoBehaviour
         }
 
         // Otherwise calculate a scaled speed
-        else
-        {
-            agent.DrawCircle(agent.position, 1.0f);
+   
+            agent.DrawCircle(target.position, 1.0f);
             float targetSpeed = maxSpeed * (distance / slowRadiusL);
             // The target velocity combines speed and direction 
             target.velocity = direction;
@@ -137,7 +147,7 @@ public class SteeringBehavior : MonoBehaviour
                 steering.linear.Normalize();
                 steering.linear *= maxAcceleration;
             }
-        }
+        
         // Output the steering
         steering.angular = 0;
         return steering;
@@ -174,11 +184,13 @@ public class SteeringBehavior : MonoBehaviour
         {
             prediction = distance / speed;
         }
+
+        agent.DrawCircle((target.position), 1.0f);
         // Put the target together 
         // Create the structure to hold our output
         SteeringOutput steering;
         steering  = this.Seek();
-        steering.linear += (target.position + target.velocity * prediction);
+        steering.linear += (target.position + target.velocity * prediction) * 10;
         return steering;
     }
 
@@ -193,19 +205,19 @@ public class SteeringBehavior : MonoBehaviour
     public double mapToRange(float rot){
         //return Math.PI * angle / 180.0;
 
+        // perform the conversion by adding or subtracting some multiple of 2π to bring the result into the given range, (-pi, pi) interval
         while (Mathf.PI < rot) {
+            // If over pi, subtract until it is within the interval
             rot -= 2 * Mathf.PI;
         }
-
-
+        //otherwise
         while (-Mathf.PI > rot) {
+            // If under -pi, add until within interval
             rot += 2 * Mathf.PI;
         }
-
-
+        // return converted rot ang
         return rot;
     }
-
 
     public SteeringOutput Face() {
         // Create the structure to hold our output
@@ -260,12 +272,11 @@ public class SteeringBehavior : MonoBehaviour
         //steering.linear = agent.position - agent.position;
         steering.linear = agent.position;//Vector3.zero;
         return steering;
-
-        
+ 
     }
 
-    public SteeringOutput Wander()
-    {
+    public SteeringOutput Wander() {
+        agent.DrawCircle(agent.position, wanderRadius * wanderOffset);
 
         float randVar = UnityEngine.Random.value - UnityEngine.Random.value;
 

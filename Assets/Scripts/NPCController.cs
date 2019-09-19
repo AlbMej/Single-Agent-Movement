@@ -89,9 +89,9 @@ public class NPCController : MonoBehaviour
                 {
                     label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Align algorithm";
                 }
-                //SteeringOutput steering5 = ai.Align();
-                //linear = steering5.linear;
-                //angular = steering5.angular;
+                SteeringOutput steering5 = ai.Face();
+                linear = steering5.linear;
+                angular = steering5.angular;
                 break;
             case 6:
                 if (label)

@@ -58,18 +58,28 @@ public class PhaseManager : MonoBehaviour
 
     void Start()
     {
-        narrator.text = "This is the place to mention major things going on during the demo, the \"narration.\"";
+        narrator.text = "Welcome to Single Agent Movement";
         spawnedNPCs = new List<GameObject>();
+        // Uncomment the below lines to test each algorithm! <---------------------------------------------
+        //EnterMapStateZero();
+        //EnterMapStateOne();
+        //EnterMapStateTwo();
+        //EnterMapStateThree();
+        //EnterMapStateFour();
+        //EnterMapStateFive(); //face/align
+        EnterMapStateSix();
+        // Uncomment the above lines to test each algorithm! <---------------------------------------------
+
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 1)); // case 1 == Seek
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 2)); // case 2 == Flee
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 3)); // case 3 == Pursue
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 4)); // case 4 == Evade 
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 5)); // case 5 == Align? 
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 6)); // case 6 == Face 
-        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 7)); // case 7 == Wander 
+        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 7)); // case 7 == Wander 
 
-        Invoke("SpawnWolf", 12);
-        Invoke("Meeting1", 30);
+        //Invoke("SpawnWolf", 12);
+        //Invoke("Meeting1", 30);
     }
 
     /// <summary>
@@ -118,45 +128,75 @@ public class PhaseManager : MonoBehaviour
                 break;
 
             case 3:
+                EnterMapStateThree();
                 break;
 
-                // ADD MORE CASES AS NEEDED
+            case 4:
+                EnterMapStateFour();
+                break;
+
+            case 5:
+                EnterMapStateFive();
+                break;
+
+            case 6:
+                EnterMapStateSix();
+                break;
         }
     }
 
-    private void EnterMapStateZero()
-    {
-        narrator.text = "In MapState Zero, we're going to ...";
+    private void EnterMapStateZero() {
+        narrator.text = "In MapState Zero, we're going to Seek out the player o.o";
+        //currentMapState = 0; // or whatever. Won't necessarily advance the phase every time
+        spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 1));
+        Invoke("SeekMeeting", 6);
+    }
 
+    private void EnterMapStateOne() {
+        narrator.text = "In MapState One, we're going to Flee D: ";
+        //currentMapState = 1; // or whatever. Won't necessarily advance the phase every time
+        spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 2));
+        Invoke("FleeMeeting", 5);
+    }
+
+    private void EnterMapStateTwo(){
+        narrator.text = "In MapState Two, we're going to Pursue >:) !";
         //currentMapState = 2; // or whatever. Won't necessarily advance the phase every time
-
-        //spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 4));
+        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText2, 3));
+        spawnedNPCs.Add(SpawnItem(spawner1, WolfPrefab, null, SpawnText2, 2));
+        Invoke("PursueMeeting", 5);
     }
 
-    private void EnterMapStateOne()
-    {
-        narrator.text = "In MapState One, we're going to ...";
-
-        //currentMapState = 2; // or whatever. Won't necessarily advance the phase every time
-
-        //spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 4));
+    private void EnterMapStateThree() { 
+        narrator.text = "In MapSate Three, we're going to Evade Dx";
+        //currentMapState = 3; // or whatever. Won't necessarily advance the phase every time
+        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText2, 3));
+        spawnedNPCs.Add(SpawnItem(spawner1, WolfPrefab, null, SpawnText2, 4));
+        Invoke("EvadeMeeting", 4);
     }
 
-    private void EnterMapStateTwo()
-    {
-        narrator.text = "Entering MapState Two";
-
-        currentMapState = 3; // or whatever. Won't necessarily advance the phase every time
-
-        //spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 4));
+    private void EnterMapStateFour() {
+        narrator.text = "In MapSate Four, we're going to Face the Player";
+        //currentMapState = 4; // or whatever. Won't necessarily advance the phase every time
+        spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 6));
+        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText2, 6));
+        Invoke("FaceMeeting", 3);
     }
-    private void EnterMapStateThree()
-    {
-        narrator.text = "Entering MapState Three";
 
-        currentMapState = 2; // or whatever. Won't necessarily advance the phase every time
+    private void EnterMapStateFive() {
+        narrator.text = "Entering MapState Five...aligning";
+        //currentMapState = 4; // or whatever. Won't necessarily advance the phase every time
+        spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 6));
+        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText2, 6));
+        Invoke("FaceMeeting", 3);
+    }
 
-        //spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 4));
+    private void EnterMapStateSix() {
+        narrator.text = "Let's both Wander!";
+        //currentMapState = 4; // or whatever. Won't necessarily advance the phase every time
+        spawnedNPCs.Add(SpawnItem(spawner2, HunterPrefab, null, SpawnText2, 7));
+        spawnedNPCs.Add(SpawnItem(spawner1, WolfPrefab, null, SpawnText2, 7));
+        Invoke("WanderMeeting", 4);
     }
 
 
@@ -194,12 +234,48 @@ public class PhaseManager : MonoBehaviour
 
     private void SpawnWolf()
     {
-        narrator.text = "The Wolf appears. Most wolves are ferocious, but this one is docile.";
+        narrator.text = "The Wolf appears. Most wolves are ferocious, but this one is docile and likes to sit back and Face its Targets.";
         spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 6));
     }
     private void Meeting1()
     {
-        narrator.text = "The Wolf and Hunter meet...";
+        narrator.text = "The Wolf and Hunter have meet.";
+        // put more actions in here
+    }
+
+    private void SeekMeeting()
+    {
+        narrator.text = "SEEKed you out";
+        // put more actions in here
+    }
+
+    private void FleeMeeting()
+    {
+        narrator.text = "Trying to Flee through a wall? No collision detection yet keep trying.";
+        // put more actions in here
+    }
+
+    private void PursueMeeting()
+    {
+        narrator.text = "Oh we're close! PURSUED YOU";
+        // put more actions in here
+    }
+
+    private void EvadeMeeting()
+    {
+        narrator.text = "Ahh he's close! Gotta Evade!";
+        // put more actions in here
+    }
+
+    private void FaceMeeting()
+    {
+        narrator.text = "We got our eyes on you o.o";
+        // put more actions in here
+    }
+
+    private void WanderMeeting()
+    {
+        narrator.text = "Enjoying the area";
         // put more actions in here
     }
 
