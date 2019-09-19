@@ -63,7 +63,9 @@ public class PhaseManager : MonoBehaviour
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 1)); // case 1 == Seek
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 2)); // case 2 == Flee
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 3)); // case 3 == Pursue
-        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 4)); // case 4 == Evade 
+        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 4)); // case 4 == Evade 
+        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 5)); // case 5 == Align? 
+        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 6)); // case 6 == Face 
 
         Invoke("SpawnWolf", 12);
         Invoke("Meeting1", 30);
@@ -192,7 +194,7 @@ public class PhaseManager : MonoBehaviour
     private void SpawnWolf()
     {
         narrator.text = "The Wolf appears. Most wolves are ferocious, but this one is docile.";
-        spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 3));
+        spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 6));
     }
     private void Meeting1()
     {

@@ -227,21 +227,21 @@ public class SteeringBehavior : MonoBehaviour
             agent.rotation = 0;
         }
 
-        float targetRotation = 0;
+        //float targetRotation = 0;
         // If we are outside the slowRadius, then use maximum rotation
         if(slowRadiusA < rotationSize){
-            targetRotation = maxRotation;
+            target.rotation = maxRotation;
+            //targetRotation = maxRotation;
         }
         else{ // Otherwise calculate a scaled rotation
-            targetRotation = maxRotation * rotationSize / slowRadiusA;
+            target.rotation = maxRotation * rotationSize / slowRadiusA;
         }
 
-
         // The final target rotation combines speed (already in the variable) and direction
-        targetRotation *= rotation / rotationSize;
+        target.rotation *= rotation / rotationSize;
 
         // Acceleration tries to get to the target rotation
-        steering.angular = targetRotation - agent.rotation;
+        steering.angular = target.rotation - agent.rotation;
         steering.angular /= timeToTarget;
 
         // Check if the acceleration is too great
@@ -251,9 +251,9 @@ public class SteeringBehavior : MonoBehaviour
             steering.angular *= maxAngularAcceleration;
         }
 
-        Vector3 a = new Vector3(0.0F, 0.0F, 0.0F);
-        steering.linear = a;
-
+        //Vector3 a = new Vector3(0.0F, 0.0F, 0.0F);
+        //steering.linear = agent.position - agent.position;
+        steering.linear = agent.position;//Vector3.zero;
         return steering;
 
         
