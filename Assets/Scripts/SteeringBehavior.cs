@@ -171,10 +171,10 @@ public class SteeringBehavior : MonoBehaviour
         }
         // Put the target together 
         // Create the structure to hold our output
-        SteeringOutput steering = new SteeringOutput();
-        steering.linear = this.Seek();
+        SteeringOutput steering;
+        steering  = this.Seek();
         //SteeringOutput steering = new SteeringOutput();
-        //steering.linear += (target.position + target.velocity * prediction);
+        steering.linear += (target.position + target.velocity * prediction);
         return steering;
     }
 
