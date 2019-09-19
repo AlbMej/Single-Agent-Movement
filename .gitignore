@@ -1,0 +1,11 @@
+.vs/
+Temp/
+Library/
+Builds/
+Logs/
+obj/
+Packages/
+ProjectSettings/
+Temp/
+SingleAgentMovement.sln
+Assembly-CSharp.csproj
