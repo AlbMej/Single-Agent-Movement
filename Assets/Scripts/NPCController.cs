@@ -70,7 +70,7 @@ public class NPCController : MonoBehaviour
                 {
                     label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Pursue algorithm!";
                 }
-                SteeringOutput steering3 = ai.Pursue();
+                SteeringOutput steering3 = ai.Wander();
                 linear = steering3.linear;
                 angular = steering3.angular;
                 break;

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 /// <summary>
 /// This is the place to put all of the various steering behavior methods we're going
 /// to be using. Probably best to put them all here, not in NPCController.
@@ -184,4 +184,112 @@ public class SteeringBehavior : MonoBehaviour
         return steering;
     }
 
+
+    public double mapToRange(float rot){
+        //return Math.PI * angle / 180.0;
+
+        while (Mathf.PI < rot) {
+            rot -= 2 * Mathf.PI;
+        }
+
+
+        while (-Mathf.PI > rot) {
+            rot += 2 * Mathf.PI;
+        }
+
+
+        return rot;
+    }
+
+
+    public SteeringOutput Face() {
+        // Create the structure to hold our output
+        SteeringOutput steering = new SteeringOutput();
+        
+        Vector3 dir = target.position - agent.position;
+        if (dir.magnitude == 0) {
+            steering.angular = 0;
+            return steering;
+        }
+
+        // Get the naive direction to the target
+        float angle = Mathf.Atan2(dir.x, dir.z);
+        //float rotation = target.orientation - agent.orientation;
+        float rotation = angle - agent.orientation;
+
+        // Map the result to the (-pi, pi) interval
+        double rot = mapToRange(rotation);
+        float rotationSize = Mathf.Abs(rotation);
+
+        // Check if we are there, return no steering
+        if (rotationSize < targetRadiusA) {
+            // return None
+            agent.rotation = 0;
+        }
+
+        float targetRotation = 0;
+        // If we are outside the slowRadius, then use maximum rotation
+        if(slowRadiusA < rotationSize){
+            targetRotation = maxRotation;
+        }
+        else{ // Otherwise calculate a scaled rotation
+            targetRotation = maxRotation * rotationSize / slowRadiusA;
+        }
+
+
+        // The final target rotation combines speed (already in the variable) and direction
+        targetRotation *= rotation / rotationSize;
+
+        // Acceleration tries to get to the target rotation
+        steering.angular = targetRotation - agent.rotation;
+        steering.angular /= timeToTarget;
+
+        // Check if the acceleration is too great
+        float angularAcceleration = Mathf.Abs(steering.angular);
+        if (angularAcceleration > maxAngularAcceleration) {
+            steering.angular /= angularAcceleration;
+            steering.angular *= maxAngularAcceleration;
+        }
+
+        Vector3 a = new Vector3(0.0F, 0.0F, 0.0F);
+        steering.linear = a;
+
+        return steering;
+
+        
+    }
+
+/* 
+    public SteeringOutput Wander(){
+
+        float randVar = Random.value - Random.value;
+
+        // 1. Calculate the target to delegate to face
+        // Update the wander orientation
+        wanderOrientation += randVar * wanderRate;
+
+        // Calculate the combined target orientation
+        target.orientation = wanderOrientation + agent.orientation;
+
+        // Calculate the center of the wander circle
+        Vector3 tmpV = new Vector3(Mathf.Sin(agent.orientation), 0, Mathf.Cos(agent.orientation));
+        Vector3 loc = agent.position + wanderOffset * tmpV;
+
+        agent.DrawCircle(loc, wanderRadius);
+
+        // Calculate the target location
+        target += wanderRadius * targetOrientation.asVector();
+
+        // 2. Delegate to face
+        steering = Face.getSteering();
+
+
+        // 3. Now set the linear acceleration to be at full acceleration in the direction of the orientation
+        steering.linear = maxAcceleration * agent.orientation.asVector();
+
+
+        return steering;
+
+    }
+*/
 }
