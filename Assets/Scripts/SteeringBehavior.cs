@@ -272,20 +272,32 @@ public class SteeringBehavior : MonoBehaviour
         target.orientation = wanderOrientation + agent.orientation;
 
         // Calculate the center of the wander circle
-        Vector3 tmpV = new Vector3(Mathf.Sin(agent.orientation), 0, Mathf.Cos(agent.orientation));
-        Vector3 loc = agent.position + wanderOffset * tmpV;
+        float x = Mathf.Sin(agent.orientation);
+        float z = Mathf.Cos(agent.orientation);
 
+        Vector3 tmpV = new Vector3(x, 0, z);
+        Vector3 loc = agent.position + wanderOffset * tmpV;
         agent.DrawCircle(loc, wanderRadius);
 
         // Calculate the target location
-        target += wanderRadius * targetOrientation.asVector();
+        x = Mathf.Sin(orientation);
+        z = Mathf.Cos(orientation);
+        Vector3 tmpV2 = new Vector3(x, 0, z);
+        loc += wanderRadius * tmpV2;
+
+        Vector3 dir = position - agent.position;
 
         // 2. Delegate to face
         steering = Face.getSteering();
 
 
         // 3. Now set the linear acceleration to be at full acceleration in the direction of the orientation
-        steering.linear = maxAcceleration * agent.orientation.asVector();
+        float x = Mathf.Sin(agent.orientation);
+        float z = Mathf.Cos(agent.orientation);
+
+        Vector3 tmpV = new Vector3(x, 0, z);
+
+        steering.linear = maxAcceleration * tmpV;
 
 
         return steering;
