@@ -49,28 +49,26 @@ public class NPCController : MonoBehaviour
                 {
                     // replace "First algorithm" with the name of the actual algorithm you're demoing
                     // do this for each phase
-                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: First algorithm";
+                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Seek algorithm";
                 }
-                // linear = ai.Pursue();   // For example
-                // angular = ai.Face();    // For example
-
-                // linear = ai.whatever();  -- replace with the desired calls
-                // angular = ai.whatever();
+                SteeringOutput steering1 = ai.Seek();
+                linear = steering1.linear;
+                angular = steering1.angular;
                 break;
 
             case 2:
                 if (label)
                 {
-                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Second algorithm";
+                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Flee algorithm!";
                 }
-                SteeringOutput steering2 = ai.Evade();
+                SteeringOutput steering2 = ai.Flee();
                 linear = steering2.linear;
                 angular = steering2.angular;
                 break;
             case 3:
                 if (label)
                 {
-                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Dynamic Third algorithm!";
+                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Pursue algorithm!";
                 }
                 SteeringOutput steering3 = ai.Pursue();
                 linear = steering3.linear;
@@ -80,29 +78,32 @@ public class NPCController : MonoBehaviour
             case 4:
                 if (label)
                 {
-                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Fourth algorithm";
+                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Evade algorithm";
                 }
-                // Delete start() here!!!
-
-                // Call Flee Function
-                SteeringOutput steering4 = ai.Seek();
-                //linear = ai.Seek();
+                SteeringOutput steering4 = ai.Evade();
                 linear = steering4.linear;
                 angular = steering4.angular;
-                //angular = 0;
-
-                //SteeringOutput steering4= ai.DynamicArrive();
-                //linear = steering4.linear;
-                //angular = steering4.angular;
                 break;
             case 5:
                 if (label)
                 {
                     label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Fifth algorithm";
                 }
-
-                // linear = ai.whatever();  -- replace with the desired calls
-                // angular = ai.whatever();
+                //ALIGN
+                break;
+            case 6:
+                if (label)
+                {
+                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Sixth algorithm";
+                }
+                //FACE
+                break;
+            case 7:
+                if (label)
+                {
+                    label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Seventh algorithm";
+                }
+                // WANDER
                 break;
 
                 // ADD CASES AS NEEDED
