@@ -60,8 +60,10 @@ public class PhaseManager : MonoBehaviour
     {
         narrator.text = "This is the place to mention major things going on during the demo, the \"narration.\"";
         spawnedNPCs = new List<GameObject>();
-        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 3)); // case 3 here <--------
-        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 4)); // case 4 here <--------
+        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 1)); // case 1 == Seek
+        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 2)); // case 2 == Flee
+        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 3)); // case 3 == Pursue
+        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 4)); // case 4 == Evade 
 
         Invoke("SpawnWolf", 12);
         Invoke("Meeting1", 30);
@@ -190,7 +192,7 @@ public class PhaseManager : MonoBehaviour
     private void SpawnWolf()
     {
         narrator.text = "The Wolf appears. Most wolves are ferocious, but this one is docile.";
-        spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 4));
+        spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, null, SpawnText2, 3));
     }
     private void Meeting1()
     {
