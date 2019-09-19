@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+
+/* Alberto Mejia
+ * Milena Xochito Gonzalez 
+ */
+
 /// <summary>
 /// This is the place to put all of the various steering behavior methods we're going
 /// to be using. Probably best to put them all here, not in NPCController.
@@ -259,10 +264,10 @@ public class SteeringBehavior : MonoBehaviour
         
     }
 
-/* 
-    public SteeringOutput Wander(){
+    public SteeringOutput Wander()
+    {
 
-        float randVar = Random.value - Random.value;
+        float randVar = UnityEngine.Random.value - UnityEngine.Random.value;
 
         // 1. Calculate the target to delegate to face
         // Update the wander orientation
@@ -271,37 +276,26 @@ public class SteeringBehavior : MonoBehaviour
         // Calculate the combined target orientation
         target.orientation = wanderOrientation + agent.orientation;
 
-        // Calculate the center of the wander circle
         float x = Mathf.Sin(agent.orientation);
         float z = Mathf.Cos(agent.orientation);
+        Vector3 agentOrientationVector = new Vector3(x, 0, z);
+        // Calculate the center of the wander circle
+        target.position = agent.position + wanderOffset * agentOrientationVector;
 
-        Vector3 tmpV = new Vector3(x, 0, z);
-        Vector3 loc = agent.position + wanderOffset * tmpV;
-        agent.DrawCircle(loc, wanderRadius);
-
-        // Calculate the target location
-        x = Mathf.Sin(orientation);
-        z = Mathf.Cos(orientation);
-        Vector3 tmpV2 = new Vector3(x, 0, z);
-        loc += wanderRadius * tmpV2;
-
-        Vector3 dir = position - agent.position;
+        float xx = Mathf.Sin(target.orientation);
+        float zz = Mathf.Cos(target.orientation);
+        Vector3 targetOrientationVector = new Vector3(xx, 0, zz);
+        // Calculate the target location 
+        target.position += wanderRadius * targetOrientationVector;
 
         // 2. Delegate to face
-        steering = Face.getSteering();
-
+        SteeringOutput steering = this.Face();
 
         // 3. Now set the linear acceleration to be at full acceleration in the direction of the orientation
-        float x = Mathf.Sin(agent.orientation);
-        float z = Mathf.Cos(agent.orientation);
+        steering.linear = maxAcceleration * agentOrientationVector;
 
-        Vector3 tmpV = new Vector3(x, 0, z);
-
-        steering.linear = maxAcceleration * tmpV;
-
-
+        // Return it
         return steering;
 
     }
-*/
 }

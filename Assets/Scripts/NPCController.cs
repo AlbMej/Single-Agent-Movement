@@ -98,16 +98,18 @@ public class NPCController : MonoBehaviour
                 {
                     label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Face algorithm";
                 }
-                SteeringOutput steering5 = ai.Face();
-                linear = steering5.linear;
-                angular = steering5.angular;
+                SteeringOutput steering6 = ai.Face();
+                linear = steering6.linear;
+                angular = steering6.angular;
                 break;
             case 7:
                 if (label)
                 {
                     label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Wander algorithm";
                 }
-                // WANDER
+                SteeringOutput steering7 = ai.Wander();
+                linear = steering7.linear;
+                angular = steering7.angular;
                 break;
 
                 // ADD CASES AS NEEDED

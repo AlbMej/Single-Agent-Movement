@@ -65,7 +65,8 @@ public class PhaseManager : MonoBehaviour
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 3)); // case 3 == Pursue
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 4)); // case 4 == Evade 
         //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 5)); // case 5 == Align? 
-        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 6)); // case 6 == Face 
+        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 6)); // case 6 == Face 
+        spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText1, 7)); // case 7 == Wander 
 
         Invoke("SpawnWolf", 12);
         Invoke("Meeting1", 30);
