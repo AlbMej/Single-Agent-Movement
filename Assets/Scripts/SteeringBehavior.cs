@@ -59,7 +59,6 @@ public class SteeringBehavior : MonoBehaviour {
      * AI for Games by Ian Millington
      */
 
-
     public SteeringOutput Seek(){
         // Create the structure to hold our output
         SteeringOutput steering = new SteeringOutput
@@ -70,7 +69,6 @@ public class SteeringBehavior : MonoBehaviour {
         steering.linear *= maxAcceleration;
         steering.angular = 0;
         return steering;
-
     }
 
     public SteeringOutput Flee() {
@@ -78,64 +76,65 @@ public class SteeringBehavior : MonoBehaviour {
         return new SteeringOutput { linear = -1 * tmp.linear };
     }
 
-    public SteeringOutput DynamicArrive() {
+    public SteeringOutput DynamicArrive(Vector3 distance) {
         target.DrawConcentricCircle(slowRadiusL);
-        Vector3 distance = target.position - agent.position;
         Vector3 targetVelocity = maxSpeed * (distance / slowRadiusL);
         Vector3 difference = targetVelocity - agent.velocity;
         targetVelocity = Vector3.ClampMagnitude((difference / timeToTarget), maxAcceleration);
         return new SteeringOutput() { linear = targetVelocity };
     }
 
-    public SteeringOutput Pursue() {
+    public SteeringOutput Pursue(Vector3 distance) {
         Vector3 predict = Vector3.ClampMagnitude(target.velocity, maxPrediction);
-        // 1.  Calculate the target to delegate to seek
-        // Work out the distance to target 
-        Vector3 direction = target.position - agent.position;
-        Vector3 circlelocation = predict + direction + agent.position;
+        Vector3 predictedLocation = predict + distance + agent.position;
+        float prediction;
+        Vector3 linearTarget = new Vector3();
+
         target.DrawConcentricCircle(targetRadiusL);
-        agent.DrawCircle(circlelocation, 1);
-        Vector3 location = Vector3.ClampMagnitude(predict + direction, maxAcceleration);
-        return new SteeringOutput() { linear = location };
+        //agent.DrawCircle(predictedLocation, 1);
+        //Vector3 location = Vector3.ClampMagnitude(predict + distance, maxAcceleration);
+
+        float speed = agent.velocity.magnitude;
+        if (speed <= (distance / maxPrediction).magnitude) {
+            prediction = maxPrediction;
+        }
+        else {
+            prediction = (distance / speed).magnitude;
+        }
+        linearTarget += (target.position + target.velocity) * prediction;
+        agent.DrawCircle(linearTarget, 1);
+        
+        linearTarget.Normalize();
+        linearTarget *= maxAcceleration;
+        return new SteeringOutput() { linear = linearTarget };
     }
 
-    public SteeringOutput PursueWithArrive() {
-        // Work out the distance to target
-        Vector3 distance = target.position - agent.position;
+    public SteeringOutput PursueWithDynamicArrive() {
+        Vector3 distance = target.position - agent.position; // The distance to target
         if (distance.magnitude < targetRadiusL) {
-            // if the distance between target and agent is smaller than the tar radius, then arrive
-            return DynamicArrive();
+            return DynamicArrive(distance);  // If the distance between target and agent is smaller than the large radius, then arrive
         }
-        return Pursue();
+        else {
+            return Pursue(distance);
+        }   
     }
 
     public SteeringOutput Evade() {
-        SteeringOutput tmp = Pursue();
+        SteeringOutput tmp = Pursue(target.position - agent.position);
         return new SteeringOutput { linear = -1 * tmp.linear };
+        //return Pursue(agent.position - target.position);
     }
 
     public float mapToRange(float rotation) {
-        // agent.orientation vs angle
-        float agentOrientation = agent.orientation % (2 * Mathf.PI);
-        if (agentOrientation < 0) {
-            agentOrientation += 2 * Mathf.PI;
-        }
-        float turningDist = (rotation - agentOrientation);
+        rotation = rotation % (2 * Mathf.PI);
 
-        // If the turning dist is greater than 180
-        if (Mathf.PI < (turningDist)) {
-            turningDist = rotation - (2 * Mathf.PI + agentOrientation);
-        }
-        else if ((-1 * Mathf.PI > (turningDist))) {
-            turningDist = (rotation + 2 * Mathf.PI) - agentOrientation;
-        }
+        float turningDist = (rotation - agent.orientation);
 
         if (Mathf.Abs(turningDist) < targetRadiusA) {
             float targetSpeed = maxRotation * (turningDist / slowRadiusA);
             float difference = targetSpeed - agent.rotation;
             turningDist = (difference / timeToTarget);
         }
-        turningDist = Mathf.Clamp(turningDist, -1 * maxAngularAcceleration, maxAngularAcceleration);
         return turningDist;
     }
 
@@ -153,10 +152,7 @@ public class SteeringBehavior : MonoBehaviour {
     }
 
     public SteeringOutput Align() {
-        float angle = target.orientation % (2 * Mathf.PI);
-        if (angle < 0) {
-            angle += 2 * Mathf.PI;
-        }
+        float angle = target.orientation;
         return new SteeringOutput { angular = mapToRange(angle) };
     }
 
@@ -183,7 +179,7 @@ public class SteeringBehavior : MonoBehaviour {
         wanderTarget += wanderRadius * AngleToVector(targetOrientation);
         Vector3 direction = wanderTarget - agent.position;
 
-        agent.DrawCircle(wanderTarget, 1);
+        agent.DrawCircle(wanderTarget, 2);
         steering.angular = mapToRange(Mathf.Atan2(direction.x, direction.z));
 
         // Now set the linear acceleration to be at full acceleration in the direction of the orientation
