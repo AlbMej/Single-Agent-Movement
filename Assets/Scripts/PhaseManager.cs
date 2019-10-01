@@ -41,14 +41,14 @@ public class PhaseManager : MonoBehaviour {
 
     private List<GameObject> spawnedNPCs;      // When you need to iterate over a number of agents.
 
-    private int seekState = 1;
-    private int fleeState = 2;
-    private int pursueState = 3;
-    private int evadeState = 4;
-    private int faceState = 5;
-    private int alignState = 6;
-    private int wanderState = 7;
-    private int staticState = 8;
+    private readonly int seekState = 1;
+    private readonly int fleeState = 2;
+    private readonly int pursueState = 3;
+    private readonly int evadeState = 4;
+    private readonly int faceState = 5;
+    private readonly int alignState = 6;
+    private readonly int wanderState = 7;
+    private readonly int staticState = 8;
 
     private int currentMapState = 0;           // This stores which state the map or level is in.
     private int previousMapState = 0;          // The map state we were just in
@@ -87,11 +87,9 @@ public class PhaseManager : MonoBehaviour {
                 if (num == 6) EnterMapStateSix();   // Align
                 if (num == 7) EnterMapStateSeven(); // Wander
                 if (num == 8) EnterMapStateEight(); // Static
+                if (num == 9) EnterMapStateNine();  // Pursue a Flee (To show circles)
             }
         }
-        // Check if a game event had caused a change of state in the level.
-        //if (currentMapState == previousMapState) return;
-        //if (currentMapState != previousMapState) DestroyNPCs();
     }
 
     private void EnterMapStateOne() { // Seek
@@ -101,12 +99,9 @@ public class PhaseManager : MonoBehaviour {
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, seekState);
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, fleeState); // Spawn a fleeing wolf (mapState 2)
-
         // Set targets to each other
         SetTarget(spawnedNPCs[0], spawnedNPCs[1]);
         SetTarget(spawnedNPCs[1], spawnedNPCs[0]);
-        //setTarget(0,1); 
-        //setTarget(1,0);
     }
 
     private void EnterMapStateTwo() { // Flee
@@ -116,7 +111,6 @@ public class PhaseManager : MonoBehaviour {
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, fleeState); // Spawn a fleeing hunter (mapState 2)
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState);
-
         SetTarget(spawnedNPCs[0], spawnedNPCs[1]);
         SetTarget(spawnedNPCs[1], spawnedNPCs[0]);
     }
@@ -125,16 +119,9 @@ public class PhaseManager : MonoBehaviour {
         DestroyNPCs();
         currentMapState = 3;
         narrator.text = "In MapState Three, we're going to Pursue the Evading wolf >:) !";
-        //HunterPrefab.GetComponent<NPCController>()
-
-        //GameObject target = SpawnItem(spawner1, HunterPrefab, WolfPrefab.GetComponent<NPCController>(), SpawnText2, 4);
-        //spawnedNPCs.Add(SpawnItem(spawner2, WolfPrefab, target.GetComponent<NPCController>(), SpawnText1, 3));
-        //spawnedNPCs.Add(target);
-
         
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, evadeState); // Spawn an Evading wolf (mapState 4)
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, pursueState);
-        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText2, 3));
         SetTarget(spawnedNPCs[0], spawnedNPCs[1]);
         SetTarget(spawnedNPCs[1], spawnedNPCs[0]);
     }
@@ -146,18 +133,16 @@ public class PhaseManager : MonoBehaviour {
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, evadeState);
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn a Static wolf (mapState 8)
-
         SetTarget(spawnedNPCs[0], spawnedNPCs[1]);
     }
 
     private void EnterMapStateFive() { // Face
         DestroyNPCs();
         currentMapState = 5;
-        narrator.text = "In MapState Four, we're going to Face with the Player";
+        narrator.text = "In MapState Five, we're going to Face the Wolf";
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, faceState);
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn a Static wolf (mapState 8)
-
         SetTarget(spawnedNPCs[0], spawnedNPCs[1]); // Set the target of Face to the static NPC
     }
 
@@ -168,16 +153,14 @@ public class PhaseManager : MonoBehaviour {
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, alignState);
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn a Static wolf (mapState 8)
-
         SetTarget(spawnedNPCs[0], spawnedNPCs[1]);  // Set the target of align to the wandering NPC
-        //SetTarget(spawnedNPCs[1], spawnedNPCs[0]);
     }
 
     private void EnterMapStateSeven() { // Wander
        DestroyNPCs();
-       this.currentMapState = 7;
+       currentMapState = 7;
        narrator.text = "In MapState Seven, let's  Wander!";
-       SpawnText2.text = "Wandering";
+       SpawnNPC(spawner1, HunterPrefab, SpawnText1, wanderState); // Spawn wandering NPC
        SpawnNPC(spawner2, WolfPrefab, SpawnText2, wanderState); // Spawn wandering NPC
     }
 
@@ -185,7 +168,15 @@ public class PhaseManager : MonoBehaviour {
         DestroyNPCs();
         currentMapState = 8;
         narrator.text = "Statics";
-        SpawnNPC(spawner1, WolfPrefab, SpawnText1, staticState); // Spawn Static NPC
+        SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn Static NPC
+    }
+
+    private void EnterMapStateNine() {  // Pursue a Flee
+        DestroyNPCs();
+        narrator.text = "In MapState Nine, we're going to Pursue a Static Wolf!";
+        SpawnNPC(spawner1, HunterPrefab, SpawnText1, pursueState);
+        SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn a Static wolf (mapState 8)
+        SetTarget(spawnedNPCs[0], spawnedNPCs[1]);
     }
 
     /// <summary>
@@ -217,11 +208,8 @@ public class PhaseManager : MonoBehaviour {
 
     private void SpawnNPC(GameObject spawnLocation, GameObject NPCprefab, Text spawnText, int mapState, NPCController targetPrefab=null) {
         // Spawns NPC
-        //GameObject target = SpawnItem(spawner1, targetPrefab, ag, SpawnText2, 2);
         GameObject agent = SpawnItem(spawnLocation, NPCprefab, targetPrefab, spawnText, mapState);
-        //agent.GetComponent<SteeringBehavior>().target = target;
         spawnedNPCs.Add(agent);
-        //spawnedNPCs.Add(SpawnItem(spawner1, HunterPrefab, null, SpawnText2, 3));
     }
 
     private void DestroyNPCs() {
@@ -233,10 +221,6 @@ public class PhaseManager : MonoBehaviour {
 
     public void SetTarget(GameObject agent, GameObject target) {
         agent.GetComponent<SteeringBehavior>().target = target.GetComponent<NPCController>();
-    }
-
-    private void setTarget(int agent, int target) {
-        spawnedNPCs[agent].GetComponent<SteeringBehavior>().target = spawnedNPCs[target].GetComponent<NPCController>();
     }
 
     // Here is an example of a method you might want for when an arrival actually happens.
