@@ -49,6 +49,7 @@ public class PhaseManager : MonoBehaviour {
     private readonly int alignState = 6;
     private readonly int wanderState = 7;
     private readonly int staticState = 8;
+    private readonly int leftCornerState = 9;
 
     private int currentMapState = 0;           // This stores which state the map or level is in.
     private int previousMapState = 0;          // The map state we were just in
@@ -62,8 +63,7 @@ public class PhaseManager : MonoBehaviour {
     // spawnedNPCs list. You can always add/remove NPCs later on.
 
     void Start() {
-        narrator.text = @"Press 1-7: {1: Seek/Flee, 
-        3: Pursue/Evade, 5: Face, 6: Align, 7: Wander, 0: Restart}";
+        narrator.text = "1: Seek&Flee, 2: Flee \n 3: Pursue, 4: Evade \n 5: Face, 6: Align \n 7: Wander \n 0: Restart";
         spawnedNPCs = new List<GameObject>();
     }
 
@@ -79,15 +79,13 @@ public class PhaseManager : MonoBehaviour {
         if (inputstring.Length > 0) {
             if (Int32.TryParse(inputstring, out int num)) {
                 if (num == 0) SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Reset
-                if (num == 1) EnterMapStateOne();   // Seek
-                if (num == 2) EnterMapStateTwo();   // Flee
-                if (num == 3) EnterMapStateThree(); // Pursue
-                if (num == 4) EnterMapStateFour();  // Evade
-                if (num == 5) EnterMapStateFive();  // Face
-                if (num == 6) EnterMapStateSix();   // Align
-                if (num == 7) EnterMapStateSeven(); // Wander
-                if (num == 8) EnterMapStateEight(); // Static
-                if (num == 9) EnterMapStateNine();  // Pursue a Flee (To show circles)
+                if (num == 1) EnterMapStateOne();   // Seek   & Flee
+                if (num == 2) EnterMapStateTwo();   // Flee   & Static
+                if (num == 3) EnterMapStateThree(); // Pursue & Static moving
+                if (num == 4) EnterMapStateFour();  // Evade  & Seek
+                if (num == 5) EnterMapStateFive();  // Face   & Static
+                if (num == 6) EnterMapStateSix();   // Align  & Static
+                if (num == 7) EnterMapStateSeven(); // Wander & Wander
             }
         }
     }
@@ -95,7 +93,7 @@ public class PhaseManager : MonoBehaviour {
     private void EnterMapStateOne() { // Seek
         DestroyNPCs();
         currentMapState = 1;
-        narrator.text = "In MapState One, the hunter will seek the fleeing wolf o.o";
+        narrator.text = "In MapState One, the hunter will Seek the Fleeing wolf o.o";
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, seekState);
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, fleeState); // Spawn a fleeing wolf (mapState 2)
@@ -107,39 +105,38 @@ public class PhaseManager : MonoBehaviour {
     private void EnterMapStateTwo() { // Flee
         DestroyNPCs();
         currentMapState = 2;
-        narrator.text = "In MapState Two, the hunter will flee a static wolf 0.0";
+        narrator.text = "In MapState Two, the hunter will Flee a static wolf 0.0";
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, fleeState); // Spawn a fleeing hunter (mapState 2)
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState);
         SetTarget(spawnedNPCs[0], spawnedNPCs[1]);
-        SetTarget(spawnedNPCs[1], spawnedNPCs[0]);
     }
 
     private void EnterMapStateThree() { //Pursue
         DestroyNPCs();
         currentMapState = 3;
-        narrator.text = "In MapState Three, we're going to Pursue the Evading wolf >:) !";
+        narrator.text = "In MapState Three, the hunter will Pursue the statically moving wolf >:) !";
         
-        SpawnNPC(spawner2, WolfPrefab, SpawnText2, evadeState); // Spawn an Evading wolf (mapState 4)
+        SpawnNPC(spawner2, WolfPrefab, SpawnText2, leftCornerState); // Spawn an Statically moving wolf 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, pursueState);
-        SetTarget(spawnedNPCs[0], spawnedNPCs[1]);
         SetTarget(spawnedNPCs[1], spawnedNPCs[0]);
     }
 
     private void EnterMapStateFour() { // Evade
         DestroyNPCs();
         currentMapState = 4;
-        narrator.text = "In MapState Four, we're going to Evade a static wolf Dx";
+        narrator.text = "In MapState Four, the hunter will Evade a Seeking wolf Dx";
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, evadeState);
-        SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn a Static wolf (mapState 8)
+        SpawnNPC(spawner2, WolfPrefab, SpawnText2, seekState); // Spawn a Seeking wolf (mapState 1)
         SetTarget(spawnedNPCs[0], spawnedNPCs[1]);
+        SetTarget(spawnedNPCs[1], spawnedNPCs[0]);
     }
 
     private void EnterMapStateFive() { // Face
         DestroyNPCs();
         currentMapState = 5;
-        narrator.text = "In MapState Five, we're going to Face the Wolf";
+        narrator.text = "In MapState Five, the hunter will Face the static Wolf";
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, faceState);
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn a Static wolf (mapState 8)
@@ -149,7 +146,7 @@ public class PhaseManager : MonoBehaviour {
     private void EnterMapStateSix() {  // Align
         DestroyNPCs();
         currentMapState = 6;
-        narrator.text = "In MapState Six, we're going to Align";
+        narrator.text = "In MapState Six, the hunter will Align themselves with the static wolf";
 
         SpawnNPC(spawner1, HunterPrefab, SpawnText1, alignState);
         SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn a Static wolf (mapState 8)
@@ -159,24 +156,9 @@ public class PhaseManager : MonoBehaviour {
     private void EnterMapStateSeven() { // Wander
        DestroyNPCs();
        currentMapState = 7;
-       narrator.text = "In MapState Seven, let's  Wander!";
+       narrator.text = "In MapState Seven, the hunter and wolf will  Wander!";
        SpawnNPC(spawner1, HunterPrefab, SpawnText1, wanderState); // Spawn wandering NPC
        SpawnNPC(spawner2, WolfPrefab, SpawnText2, wanderState); // Spawn wandering NPC
-    }
-
-    private void EnterMapStateEight() {  // Static
-        DestroyNPCs();
-        currentMapState = 8;
-        narrator.text = "Statics";
-        SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn Static NPC
-    }
-
-    private void EnterMapStateNine() {  // Pursue a Flee
-        DestroyNPCs();
-        narrator.text = "In MapState Nine, we're going to Pursue a Static Wolf!";
-        SpawnNPC(spawner1, HunterPrefab, SpawnText1, pursueState);
-        SpawnNPC(spawner2, WolfPrefab, SpawnText2, staticState); // Spawn a Static wolf (mapState 8)
-        SetTarget(spawnedNPCs[0], spawnedNPCs[1]);
     }
 
     /// <summary>

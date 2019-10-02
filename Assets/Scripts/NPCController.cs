@@ -43,7 +43,6 @@ public class NPCController : MonoBehaviour {
     /// 
     /// </summary>
     void FixedUpdate() {
-        //SteeringOutput steering = new SteeringOutput();
         switch (mapState) {
             case 1:
                 if (label) {
@@ -61,7 +60,7 @@ public class NPCController : MonoBehaviour {
                 if (label) {
                     label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Pursue algorithm!";
                 }
-                steering = ai.Pursue();
+                steering = ai.PursueWithDynamicArrive();
                 break;
 
             case 4:
@@ -69,6 +68,7 @@ public class NPCController : MonoBehaviour {
                     label.text = name.Replace("(Clone)", "") + "\nAlgorithm: Evade algorithm";
                 }
                 steering = ai.Evade();
+                steering.angular = ai.FaceAway().angular;
                 break;
             case 5:
                 if (label) {
@@ -89,12 +89,21 @@ public class NPCController : MonoBehaviour {
                 steering = ai.Wander();
                 break;
             case 8: // Static case
+                if (label) {
+                    label.text = name.Replace("(Clone)", "") + "\nStatic NPC";
+                }
                 steering.linear = Vector3.zero;
                 steering.angular = 0;
                 orientation = 2f;
                 break;
+            case 9: // Moves NPC towards left corner
+                if (label) {
+                    label.text = name.Replace("(Clone)", "") + "\nMoving towards Left Corner";
+                }
+                steering.linear = 2* Vector3.forward + 3 * Vector3.left;
+                steering.angular = 0f;
+                break;
         }
-        // BUG PRESSING 3 THEN 4
         linear = steering.linear;
         angular = steering.angular;
 

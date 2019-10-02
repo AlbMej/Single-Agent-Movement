@@ -4,7 +4,6 @@ using UnityEngine;
 using System;
 
 /* Alberto Mejia
- * Milena Xochito Gonzalez 
  */
 
 /// <summary>
@@ -55,7 +54,41 @@ public class SteeringBehavior : MonoBehaviour {
         //wanderOrientation = agent.orientation;
     }
 
-    /* These functions follow the pseudo-code in the book
+    /*
+     * Auxiliary functions for the Movement algorithms 
+     */
+
+    private float GetDistance(){
+        Vector3 direction = target.position - agent.position;
+        return direction.magnitude;
+    }
+
+    private Vector3 GetDirection(){
+        return target.position - agent.position;
+    }
+
+    public float MapToRadians(float rotation) {
+        // Converts rotation to (-pi, pi) radians interval  
+        rotation = rotation % (2 * Mathf.PI);
+        float turningDist = rotation - agent.orientation;
+        if (Mathf.Abs(turningDist) < targetRadiusA) {
+            float targetSpeed = maxRotation * (turningDist / slowRadiusA);
+            float difference = targetSpeed - agent.rotation;
+            turningDist = (difference / timeToTarget);
+        }
+        return turningDist;
+    }
+
+    public float randomBinomial() {
+        // Returns a random number between −1 and 1, where values around zero are more likely.
+        return UnityEngine.Random.value - UnityEngine.Random.value;
+    }
+
+    private Vector3 AngleToVector(float angle) {
+        return new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle));
+    }
+
+    /* These Movements algorithms follow the pseudo-code in the book
      * AI for Games by Ian Millington
      */
 
@@ -72,71 +105,29 @@ public class SteeringBehavior : MonoBehaviour {
     }
 
     public SteeringOutput Flee() {
-        SteeringOutput tmp = Seek();
-        return new SteeringOutput { linear = -1 * tmp.linear }; //, angular = FaceAway().angular }; <- When wall collision is implemented add
+        return new SteeringOutput {linear = -1 *  Seek().linear}; //, angular = FaceAway().angular }; <- Add when wall collision is implemented.
     }
 
     public SteeringOutput DynamicArrive(Vector3 direction) {
-        //// Create the structure to hold our output
-        //SteeringOutput steering = new SteeringOutput();
-
-        //// Get the direction to the target
-        ////Vector3 direction = target.position - agent.position;
-        //float distance = direction.magnitude;
-        //float targetSpeed;
-
-        //// Check if we are there, return no steering
-        //if (distance < targetRadiusL) {
-        //    targetSpeed = 0;
-        //    steering.linear = Vector3.zero;
-        //    return steering;
-        //}
-        //// If we are outside the slowRadius, then go max speed
-        //else if (distance > slowRadiusL) {
-        //    targetSpeed = maxSpeed;
-        //}
-        //// Otherwise calculate a scaled speed
-        //else {
-        //    targetSpeed = maxSpeed * distance / slowRadiusL;
-        //}
-
-        //// The target velocity combines speed and direction
-        //Vector3 targetVelocity = direction;
-        //targetVelocity.Normalize();
-        //targetVelocity *= targetSpeed;
-
-        //// Acceleration tries to get to the target velocity
-        //steering.linear = targetVelocity - agent.velocity;
-        //steering.linear = steering.linear / timeToTarget;
-
-        //// Check if the acceleration is too fast
-        //if (steering.linear.magnitude > maxAcceleration) {
-        //    steering.linear.Normalize();
-        //    steering.linear *= maxAcceleration;
-        //}
-
-        //// Output the steering 
-        //return steering;
-
         target.DrawConcentricCircle(slowRadiusL);
         Vector3 targetVelocity = maxSpeed * (direction / slowRadiusL);
         Vector3 difference = targetVelocity - agent.velocity;
         targetVelocity = Vector3.ClampMagnitude((difference / timeToTarget), maxAcceleration);
-        return new SteeringOutput() { linear = targetVelocity };
+        return new SteeringOutput() {linear = targetVelocity};
     }
 
-    public SteeringOutput Pursue(Vector3 distance) {
+    public SteeringOutput Pursue(float distance) {
         float prediction;
         Vector3 linearTarget = new Vector3();
 
         target.DrawConcentricCircle(targetRadiusL);
 
         float speed = agent.velocity.magnitude;
-        if (speed <= (distance.magnitude / maxPrediction)) {
+        if (speed <= (distance / maxPrediction)) {
             prediction = maxPrediction;
         }
         else {
-            prediction = (distance.magnitude / speed);
+            prediction = (distance / speed);
         }
         linearTarget += (target.position + target.velocity * prediction) - agent.position;
         agent.DrawCircle(linearTarget+agent.position, 1);
@@ -147,75 +138,35 @@ public class SteeringBehavior : MonoBehaviour {
     }
 
     public SteeringOutput PursueWithDynamicArrive() {
-        Vector3 direction = target.position - agent.position; // The distance to target
-        if (direction.magnitude < targetRadiusL) {
-            return DynamicArrive(direction);  // If the distance between target and agent is smaller than the large radius, then arrive
+        float distance = GetDistance(); // The distance to target
+        if (distance < targetRadiusL) { // If the distance between target and agent is smaller than the large radius, then arrive
+            return DynamicArrive(GetDirection());  
         }
         else {
-            return Pursue(direction);
+            return Pursue(distance);
         }
     }
 
     public SteeringOutput Evade() {
-        SteeringOutput tmp = Pursue(target.position - agent.position);
-        return new SteeringOutput { linear = -1*(tmp.linear+agent.position), angular = FaceAway().angular};
-
-        //float prediction;
-        //Vector3 direction = target.position - agent.position;
-        //Vector3 linearTarget = new Vector3();
-
-        //target.DrawConcentricCircle(targetRadiusL);
-
-        //float speed = agent.velocity.magnitude;
-        //if (speed <= (direction.magnitude / maxPrediction)) {
-        //    prediction = maxPrediction;
-        //}
-        //else {
-        //    prediction = (direction.magnitude / speed);
-        //}
-        //linearTarget += (target.position + target.velocity * prediction) ;
-        //agent.DrawCircle(linearTarget, 1);
-        //linearTarget.Normalize();
-        //linearTarget *= maxAcceleration;
-        //return new SteeringOutput() { linear = -1*linearTarget , angular = FaceAway().angular};
-    }
-
-    public float mapToRange(float rotation) {
-        rotation = rotation % (2 * Mathf.PI);
-        float turningDist = rotation - agent.orientation;
-        if (Mathf.Abs(turningDist) < targetRadiusA) {
-            float targetSpeed = maxRotation * (turningDist / slowRadiusA);
-            float difference = targetSpeed - agent.rotation;
-            turningDist = (difference / timeToTarget);
-        }
-        return turningDist;
+        return new SteeringOutput {linear = -1*(Pursue(GetDistance()).linear), angular = FaceAway().angular};
     }
 
     public SteeringOutput Face() {
         Vector3 dir = target.position - agent.position;
         // Get the naive direction to the target
         float angle = Mathf.Atan2(dir.x, dir.z);
-        return new SteeringOutput { angular = mapToRange(angle) };
+        return new SteeringOutput { angular = MapToRadians(angle) };
     }
 
     public SteeringOutput FaceAway() {
         Vector3 dir = agent.position - target.position;
         float angle = Mathf.Atan2(dir.x, dir.z);
-        return new SteeringOutput { angular = mapToRange(angle) };
+        return new SteeringOutput { angular = MapToRadians(angle) };
     }
 
     public SteeringOutput Align() {
         float angle = target.orientation;
-        return new SteeringOutput { angular = mapToRange(angle) };
-    }
-
-    public float randomBinomial() {
-        // returns a random number between −1 and 1, where values around zero are more likely.
-        return UnityEngine.Random.value - UnityEngine.Random.value;
-    }
-
-    private Vector3 AngleToVector(float angle) {
-        return new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle));
+        return new SteeringOutput { angular = MapToRadians(angle) };
     }
 
     public SteeringOutput Wander() {
@@ -233,7 +184,7 @@ public class SteeringBehavior : MonoBehaviour {
         Vector3 direction = wanderTarget - agent.position;
 
         agent.DrawCircle(wanderTarget, 2);
-        steering.angular = mapToRange(Mathf.Atan2(direction.x, direction.z));
+        steering.angular = MapToRadians(Mathf.Atan2(direction.x, direction.z));
 
         // Now set the linear acceleration to be at full acceleration in the direction of the orientation
         steering.linear = maxAcceleration * AngleToVector(agent.orientation);
